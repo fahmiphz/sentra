@@ -1,69 +1,79 @@
-import Image from "next/image";
+'use client'; // Wajib ditambahkan karena file ini menggunakan state & efek (useState, useEffect)
 
-export default function Home() {
+import React, { useState, useEffect } from 'react';
+
+
+// 2. Import Semua Komponen Tampilan (Views)
+import Navbar from '@/components/Navbar';
+import HomeView from '@/views/HomeView';
+import KaryaView from '@/views/KaryaView';
+import PrestasiView from '@/views/PrestasiView';
+import GaleriView from '@/views/GaleriView';
+import BlogView from '@/views/BlogView';
+import Lab3DView from '@/views/Lab3DView';
+import LoginView from '@/views/LoginView';
+import AdminDashboard from '@/views/AdminDashboard';
+
+export default function App() {
+  // State Navigasi
+  const [currentView, setCurrentView] = useState('home');
+  
+  // State Autentikasi (Admin)
+  const [user, setUser] = useState<any>(null);
+  const [isAdminAuth, setIsAdminAuth] = useState(false);
+  
+  // State Tahun untuk mengatasi Hydration Error
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
+  
+
+  // Set tahun saat komponen di-mount di klien (Browser)
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
+
+  // (Nanti letakkan useEffect Firebase Anda di sini sesuai kode asli)
+
+  // 3. Fungsi Render Berdasarkan Menu (Switch Case dari kode asli Anda)
+  const renderView = () => {
+    switch (currentView) {
+      case 'home': return <HomeView setCurrentView={setCurrentView} />;
+      case 'karya': return <KaryaView />;
+      case 'prestasi': return <PrestasiView />;
+      case 'lab3d': return <Lab3DView />;
+      case 'galeri': return <GaleriView />;
+      case 'blog': return <BlogView />;
+      case 'login': return <LoginView setAdminState={setIsAdminAuth} setCurrentView={setCurrentView} />;
+      case 'admin': 
+        return isAdminAuth 
+          ? <AdminDashboard user={user} setAdminState={setIsAdminAuth} setCurrentView={setCurrentView} /> 
+          : <LoginView setAdminState={setIsAdminAuth} setCurrentView={setCurrentView} />;
+      default: return <HomeView setCurrentView={setCurrentView} />;
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-teal-100 selection:text-teal-900">
+      {/* Navbar Menerima Props user dan state navigasi */}
+      <Navbar 
+        currentView={currentView} 
+        setCurrentView={setCurrentView} 
+        user={{ ...user, isAdmin: isAdminAuth }} 
+      />
+      
+      {/* Wadah Utama Tempat Halaman Dirender */}
+      <main className="relative">
+        {renderView()}
       </main>
+      
+      {/* Footer disembunyikan saat di halaman Admin/Login */}
+      {currentView !== 'admin' && currentView !== 'login' && (
+        <footer className="bg-gray-50 py-12 border-t border-gray-100">
+          <div className="max-w-6xl mx-auto px-4 text-center text-gray-500 text-xs">
+            <p>© {currentYear !== null ? currentYear : ''} Program Keahlian RPL SMK-IT As-Syifa Boarding School Subang.</p>
+            <p className="mt-1 text-gray-400">Membangun peradaban digital dengan akhlaq mulia & standar teknologi global.</p>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }

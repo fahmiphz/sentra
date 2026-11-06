@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// --- 1. HOME (Hero Banner / Slider) ---
+model HomeBanner {
+  id          String   @id @default(cuid())
+  title       String?
+  imageUrl    String
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// --- 2. KARYA (Portofolio) ---
+model Karya {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  imageUrl    String
+  techStack   String?
+  linkUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// --- 3. PRESTASI (Awards) ---
+model Prestasi {
+  id          String   @id @default(cuid())
+  title       String
+  peringkat   String
+  tingkat     String
+  tahun       Int
+  imageUrl    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// --- 4. GALERI (Foto Kegiatan) ---
+model Galeri {
+  id          String   @id @default(cuid())
+  title       String?
+  imageUrl    String
+  kategori    String?
+  createdAt   DateTime @default(now())
+}
+
+// --- 5. BLOG (Artikel / Berita) ---
+model Blog {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  content     String   @db.Text
+  coverImage  String
+  author      String   @default("Admin")
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
